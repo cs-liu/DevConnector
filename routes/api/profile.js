@@ -14,6 +14,8 @@ const Post = require("../../models/Post");
 //@access  Private
 router.get("/me", auth, async (req, res) => {
   try {
+    //populate()用于在查询中自动填充关联字段。
+    //这里使用populate将用户的名字和头像附加到用户的个人资料中，返回给前端更加完整的数据。
     const profile = await Profile.findOne({ user: req.user.id }).populate(
       "user",
       ["name", "avatar"]
@@ -48,7 +50,7 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    // destructure the request
+    // destructure the request 解构出用户提交的个人信息
     const {
       company,
       website,
@@ -64,7 +66,7 @@ router.post(
       facebook,
     } = req.body;
 
-    //Build profile object
+    //Build profile object 生成一个profileFields对象，用于创建或更新个人资料
     const profileFields = {};
     profileFields.user = req.user.id;
     if (company) profileFields.company = company;
@@ -130,6 +132,7 @@ router.get("/", async (req, res) => {
 //@access  Public
 router.get("/user/:user_id", async (req, res) => {
   try {
+    //req.params.user_id：从URL中提取用户ID，并在数据库中查找相应的个人资料。
     const profile = await Profile.findOne({
       user: req.params.user_id,
     }).populate("user", ["name", "avatar"]);
@@ -312,6 +315,7 @@ router.delete("/education/:edu_id", auth, async (req, res) => {
 in order to do this
 我们需要在github中注册一个OAuth APP,获取 client ID 和 client secret
 然后把这两者对应的值放进我们的config values中（在default.json中配置）
+client_id和client_secret：通过OAuth App获取的认证凭据，用于访问GitHub API
 然后在GET方法中使用
  */
 //@route   GET api/profile/github/:username
